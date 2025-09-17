@@ -82,7 +82,14 @@ function App() {
     </ProtectedRoute>
   }
 />
-
+        <Route
+  path="/profile"
+  element={
+    <ProtectedRoute allowedRoles={["driver", "passenger"]}>
+      <Profile />
+    </ProtectedRoute>
+  }
+/>
       </Routes>
     </Router>
   );
