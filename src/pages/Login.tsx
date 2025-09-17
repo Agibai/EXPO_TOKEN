@@ -19,6 +19,17 @@ export default function Login() {
     } catch (err: any) {
       setError(err.response?.data?.message || "Ошибка входа");
     }
+    const handleLogin = async () => {
+  try {
+    const res = await api.post("/auth/login", { email, password });
+    localStorage.setItem("token", res.data.access_token);
+    localStorage.setItem("role", res.data.role); // сохраняем роль
+    navigate("/trips");
+  } catch (err) {
+    alert("Ошибка входа");
+  }
+};
+
   };
 
   return (
