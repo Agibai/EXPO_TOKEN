@@ -5,6 +5,17 @@ import { PrismaService } from '../prisma/prisma.service';
 export class BookingsService {
   constructor(private prisma: PrismaService) {}
 
+  async payWithKaspi(bookingId: number): Promise<boolean> {
+    // Здесь должна быть интеграция с реальным Kaspi API
+    // Для примера — просто меняем статус бронирования
+    const booking = await this.findBookingById(bookingId);
+    if (!booking) return false;
+    booking.paymentStatus = 'paid';
+    await this.saveBooking(booking); // сохранение в БД
+    return true;
+  }
+}
+  
   async createBooking(dto: { tripId: number; passengerId: number; seatsBooked: number; paymentMethod: string }) {
     const { tripId, passengerId, seatsBooked, paymentMethod } = dto;
     if (seatsBooked <= 0) throw new BadRequestException('seatsBooked must be > 0');
