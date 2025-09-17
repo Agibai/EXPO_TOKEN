@@ -1,0 +1,78 @@
+datasource db {
+provider = "postgresql"
+url = env("DATABASE_URL")
+}
+
+
+generator client {
+provider = "prisma-client-js"
+}
+
+
+model User {
+id Int @id @default(autoincrement())
+phone String @unique
+name String?
+role String
+rating Float @default(0)
+createdAt DateTime @default(now())
+driver Driver?
+bookings Booking[]
+trips Trip[] @relation("DriverTrips")
+}
+
+
+model Driver {
+id Int @id @default(autoincrement())
+userId Int @unique
+license String?
+carModel String?
+carPlate String?
+docsStatus String @default("pending")
+user User @relation(fields: [userId], references: [id])
+}
+
+
+model Trip {
+id Int @id @default(autoincrement())
+driverId Int
+startPoint String
+endPoint String
+startTime DateTime
+totalSeats Int
+seatsAvailable Int
+pricePerSeat Float
+priceFull Float
+status String @default("published")
+createdAt DateTime @default(now())
+driver User @relation("DriverTrips", fields: [driverId], references: [id])
+bookings Booking[]
+}
+
+
+model Booking {
+id Int @id @default(autoincrement())
+tripId Int
+passengerId Int
+seatsBooked Int
+totalPrice Float
+paymentMethod String
+paymentStatus String @default("pending")
+status String @default("reserved")
+createdAt DateTime @default(now())
+trip Trip @relation(fields: [tripId], references: [id])
+passenger User @relation(fields: [passengerId], references: [id])
+payment Payment?
+}
+
+
+model Payment {
+id Int @id @default(autoincrement())
+bookingId Int
+amount Float
+method String
+providerTxnId String?
+status String
+createdAt DateTime @default(now())
+booking Booking @relation(fields: [bookingId], references: [id])
+}
