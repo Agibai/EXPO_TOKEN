@@ -15,7 +15,19 @@ export class BookingsService {
     return true;
   }
 }
-  
+
+async updateBooking(bookingId: number, seatsBooked: number) {
+  const booking = await this.prisma.booking.update({
+    where: { id: bookingId },
+    data: { seatsBooked },
+  });
+
+  async updateBooking(bookingId: number, seatsBooked: number) {
+  const booking = await this.prisma.booking.update({
+    where: { id: bookingId },
+    data: { seatsBooked },
+  });
+    
   async createBooking(dto: { tripId: number; passengerId: number; seatsBooked: number; paymentMethod: string }) {
     const { tripId, passengerId, seatsBooked, paymentMethod } = dto;
     if (seatsBooked <= 0) throw new BadRequestException('seatsBooked must be > 0');
@@ -30,6 +42,31 @@ export class BookingsService {
         data: { seatsAvailable: trip.seatsAvailable - seatsBooked }
       });
 
+      async cancelBooking(bookingId: number) {
+  const booking = await this.prisma.booking.delete({
+    where: { id: bookingId },
+  });
+
+  // создаём уведомление для пассажира
+  await this.prisma.notification.create({
+    data: {
+      userId: booking.userId,
+      message: `Ваше бронирование на поездку ${booking.from} → ${booking.to} было отменено.`,
+    },
+  });
+
+  // уведомляем водителя
+  if (booking.driverId) {
+    await this.prisma.notification.create({
+      data: {
+        driverId: booking.driverId,
+        message: `Бронирование пассажира на поездку ${booking.from} → ${booking.to} отменено.`,
+      },
+    });
+  }
+
+  return booking;
+}
       const totalPrice = (trip.pricePerSeat || 0) * seatsBooked;
 
       const booking = await prisma.booking.create({
