@@ -49,6 +49,26 @@ export default function MyBookings() {
     }
   };
 
+  const handleKaspiPay = async (id: number) => {
+  try {
+    await api.post(`/bookings/${id}/pay-kaspi`);
+    alert('Оплата Kaspi прошла успешно!');
+    fetchBookings(); // обновление статусов сразу
+  } catch (err: any) {
+    alert(err.response?.data?.message || 'Ошибка оплаты через Kaspi');
+  }
+};
+
+// Кнопка оплаты
+{b.paymentMethod === 'kaspi' && b.paymentStatus !== 'paid' && (
+  <button
+    onClick={() => handleKaspiPay(b.id)}
+    className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+  >
+    Оплатить Kaspi
+  </button>
+)}
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Мои бронирования</h1>
