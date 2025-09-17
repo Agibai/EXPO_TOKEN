@@ -106,6 +106,14 @@ function App() {
     </ProtectedRoute>
   }
 />
+        <Route
+  path="/book-trip"
+  element={
+    <ProtectedRoute allowedRoles={["passenger"]}>
+      <BookTrip />
+    </ProtectedRoute>
+  }
+/>
       </Routes>
     </Router>
   );
