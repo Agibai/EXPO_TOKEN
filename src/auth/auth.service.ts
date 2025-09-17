@@ -29,4 +29,16 @@ const payload = { sub: user.id, phone: user.phone, role: user.role };
 const token = this.jwt.sign(payload);
 return { accessToken: token, user: { id: user.id, phone: user.phone, role: user.role } };
 }
+
+
+  async validateUser(email: string, pass: string) {
+  const user = await this.usersService.findByEmail(email);
+  if (user && user.password === pass) {
+    // возвращаем роль вместе с токеном
+    const { password, ...result } = user;
+    return result;
+  }
+  return null;
+}
+
 }
