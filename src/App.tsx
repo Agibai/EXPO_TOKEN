@@ -6,6 +6,7 @@ import Bookings from "./pages/Bookings";
 import CreateTrip from "./pages/CreateTrip";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import DriverTrips from "./pages/DriverTrips";
 
 function App() {
   return (
@@ -38,6 +39,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/driver-trips"
+  element={
+    <ProtectedRoute>
+      <DriverTrips />
+    </ProtectedRoute>
+  }
+/>
       </Routes>
     </Router>
   );
