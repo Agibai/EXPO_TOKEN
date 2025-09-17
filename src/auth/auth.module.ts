@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PrismaService } from '../prisma/prisma.service';
+import { JwtStrategy } from './jwt.strategy';
 
 
 @Module({
@@ -16,7 +17,7 @@ useFactory: (cs: ConfigService) => ({ secret: cs.get('JWT_SECRET') || 'secret', 
 })
 ],
 controllers: [AuthController],
-providers: [AuthService, PrismaService],
+providers: [AuthService, PrismaService, JwtStrategy],
 exports: [AuthService]
 })
 export class AuthModule {}
