@@ -1,0 +1,45 @@
+name: Build YRGYZ Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install -g expo-cli eas-cli && npm install
+
+      - name: Authenticate with Expo
+        run: eas login --token ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Android APK
+        run: eas build --platform android --non-interactive --profile preview --local --output ./yrgyz.apk
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: yrgyz-apk
+          path: ./yrgyz.apk
+
+      - name: Get latest build info
+        run: |
+          eas build:list --limit=1 --json > build.json
+          cat build.json | jq -r '.[0].artifacts.buildUrl' > apk_url.txt
+
+      - name: Send APK link to Telegram
+        run: |
+          APK_URL=$(cat apk_url.txt)
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage             -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }}             -d text="🚖 YRGYZ: новый APK готов!\n\n📥 Скачать: $APK_URL"
