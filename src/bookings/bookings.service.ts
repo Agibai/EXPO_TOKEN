@@ -42,6 +42,51 @@ async updateBooking(bookingId: number, seatsBooked: number) {
         data: { seatsAvailable: trip.seatsAvailable - seatsBooked }
       });
 
+      async payWithKaspi(bookingId: number): Promise<boolean> {
+  const booking = await this.prisma.booking.findUnique({ where: { id: bookingId } });
+  if (!booking) return false;
+
+  // пример имитации запроса к KaspiPay
+  // в реальном проекте здесь будет API Kaspi с ключами и подписью
+  const kaspiResponse = await fakeKaspiApiPay(bookingId, booking.totalPrice);
+
+  if (kaspiResponse.status === "success") {
+    await this.prisma.booking.update({
+      where: { id: bookingId },
+      data: { paymentStatus: "paid" },
+    });
+
+    // уведомляем пассажира
+    await this.prisma.notification.create({
+      data: {
+        userId: booking.userId,
+        message: `Оплата бронирования на поездку ${booking.from} → ${booking.to} прошла успешно!`,
+      },
+    });
+
+    // уведомляем водителя
+    if (booking.driverId) {
+      await this.prisma.notification.create({
+        data: {
+          driverId: booking.driverId,
+          message: `Пассажир оплатил бронирование на поездку ${booking.from} → ${booking.to}.`,
+        },
+      });
+    }
+
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// имитация Kaspi API
+async function fakeKaspiApiPay(bookingId: number, amount: number) {
+  return new Promise<{ status: string }>((resolve) => {
+    setTimeout(() => resolve({ status: "success" }), 1000);
+  });
+}
+
       async cancelBooking(bookingId: number) {
   const booking = await this.prisma.booking.delete({
     where: { id: bookingId },
@@ -83,5 +128,6 @@ async updateBooking(bookingId: number, seatsBooked: number) {
 
       return { booking };
     });
+    
   }
 }
