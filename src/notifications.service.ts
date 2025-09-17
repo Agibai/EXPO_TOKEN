@@ -21,4 +21,18 @@ export class NotificationsService {
       data: { userId, message },
     });
   }
+
+  async getDriverNotifications(driverId: number) {
+  // уведомления только для водителя
+  return this.prisma.notification.findMany({
+    where: { driverId },
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
+async createDriverNotification(driverId: number, message: string) {
+  return this.prisma.notification.create({
+    data: { driverId, message },
+  });
+}
 }
