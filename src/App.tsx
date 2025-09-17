@@ -90,11 +90,7 @@ function App() {
     </ProtectedRoute>
   }
 />
-      </Routes>
-    </Router>
-  );
-}
-<Route
+        <Route
   path="/payment-history"
   element={
     <ProtectedRoute allowedRoles={["passenger"]}>
@@ -102,5 +98,17 @@ function App() {
     </ProtectedRoute>
   }
 />
+        <Route
+  path="/driver-panel"
+  element={
+    <ProtectedRoute allowedRoles={["driver"]}>
+      <DriverPanel />
+    </ProtectedRoute>
+  }
+/>
+      </Routes>
+    </Router>
+  );
+}
 
 export default App;
