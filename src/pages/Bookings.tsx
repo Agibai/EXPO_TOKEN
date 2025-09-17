@@ -20,6 +20,10 @@ export default function Bookings() {
 
   useEffect(() => {
     fetchBookings();
+
+    // Polling каждые 5 секунд
+    const interval = setInterval(fetchBookings, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const handlePay = async (id: number) => {
@@ -67,7 +71,6 @@ export default function Bookings() {
               <p><strong>Статус оплаты:</strong> {b.paymentStatus}</p>
             </div>
 
-            {/* Редактирование бронирования */}
             {b.paymentStatus !== "paid" && (
               <div className="flex gap-2 flex-wrap items-center">
                 <input
