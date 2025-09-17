@@ -7,6 +7,11 @@ export class NotificationsController {
     return this.notificationsService.getUserNotifications(req.user.userId);
   }
 
+  @Get('driver')
+getDriverNotifications(@Req() req) {
+  return this.notificationsService.getDriverNotifications(req.user.userId);
+}
+
   @Post(':id/read')
   markRead(@Param('id') id: string) {
     return this.notificationsService.markAsRead(+id);
