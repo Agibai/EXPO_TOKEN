@@ -56,6 +56,33 @@ function App() {
     </ProtectedRoute>
   }
 />
+        <Route
+  path="/driver-dashboard"
+  element={
+    <ProtectedRoute allowedRoles={["driver"]}>
+      <DriverDashboard />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/driver-trips"
+  element={
+    <ProtectedRoute allowedRoles={["driver"]}>
+      <DriverTrips />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/trips"
+  element={
+    <ProtectedRoute allowedRoles={["passenger", "driver"]}>
+      <Trips />
+    </ProtectedRoute>
+  }
+/>
+
       </Routes>
     </Router>
   );
