@@ -1,76 +1,91 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../api/api";
-import { useNavigate } from "react-router-dom";
 
-export default function CreateTrip() {
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [date, setDate] = useState("");
-  const [seatsAvailable, setSeatsAvailable] = useState(1);
-  const [pricePerSeat, setPricePerSeat] = useState(0);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const navigate = useNavigate();
+interface Trip {
+  id: number;
+  from: string;
+  to: string;
+  date: string;
+  seatsAvailable: number;
+  pricePerSeat: number;
+}
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await api.post("/trips", { from, to, date, seatsAvailable, pricePerSeat });
-      setSuccess("Поездка создана!");
-      setError("");
-      navigate("/trips"); // перенаправление на список поездок
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Ошибка создания поездки");
-      setSuccess("");
-    }
+export default function Trips() {
+  const [trips, setTrips] = useState<Trip[]>([]);
+  const [filteredTrips, setFilteredTrips] = useState<Trip[]>([]);
+  const [fromFilter, setFromFilter] = useState("");
+  const [toFilter, setToFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+
+  useEffect(() => {
+    api.get("/trips").then((res) => {
+      setTrips(res.data);
+      setFilteredTrips(res.data);
+    });
+  }, []);
+
+  const handleFilter = () => {
+    let filtered = trips;
+    if (fromFilter) filtered = filtered.filter((t) => t.from.toLowerCase().includes(fromFilter.toLowerCase()));
+    if (toFilter) filtered = filtered.filter((t) => t.to.toLowerCase().includes(toFilter.toLowerCase()));
+    if (dateFilter) filtered = filtered.filter((t) => t.date.startsWith(dateFilter));
+    setFilteredTrips(filtered);
+  };
+
+  const handleReset = () => {
+    setFromFilter("");
+    setToFilter("");
+    setDateFilter("");
+    setFilteredTrips(trips);
   };
 
   return (
-    <div className="flex justify-center p-4">
-      <form onSubmit={handleCreate} className="p-6 border rounded shadow w-96">
-        <h1 className="text-xl font-bold mb-4">Создать поездку</h1>
-        {error && <p className="text-red-500 mb-2">{error}</p>}
-        {success && <p className="text-green-500 mb-2">{success}</p>}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Доступные поездки</h1>
+
+      {/* Фильтры */}
+      <div className="mb-4 flex gap-2 flex-wrap">
         <input
           type="text"
           placeholder="Откуда"
-          value={from}
-          onChange={(e) => setFrom(e.target.value)}
-          className="w-full mb-2 p-2 border rounded"
+          value={fromFilter}
+          onChange={(e) => setFromFilter(e.target.value)}
+          className="p-2 border rounded"
         />
         <input
           type="text"
           placeholder="Куда"
-          value={to}
-          onChange={(e) => setTo(e.target.value)}
-          className="w-full mb-2 p-2 border rounded"
+          value={toFilter}
+          onChange={(e) => setToFilter(e.target.value)}
+          className="p-2 border rounded"
         />
         <input
-          type="datetime-local"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="w-full mb-2 p-2 border rounded"
+          type="date"
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+          className="p-2 border rounded"
         />
-        <input
-          type="number"
-          placeholder="Количество мест"
-          value={seatsAvailable}
-          onChange={(e) => setSeatsAvailable(parseInt(e.target.value))}
-          className="w-full mb-2 p-2 border rounded"
-          min={1}
-        />
-        <input
-          type="number"
-          placeholder="Цена за место"
-          value={pricePerSeat}
-          onChange={(e) => setPricePerSeat(parseInt(e.target.value))}
-          className="w-full mb-4 p-2 border rounded"
-          min={0}
-        />
-        <button type="submit" className="w-full p-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-          Создать
+        <button onClick={handleFilter} className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+          Применить
         </button>
-      </form>
+        <button onClick={handleReset} className="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400">
+          Сбросить
+        </button>
+      </div>
+
+      {/* Список поездок */}
+      <div className="grid gap-4">
+        {filteredTrips.map((trip) => (
+          <div key={trip.id} className="p-4 border rounded shadow">
+            <p><strong>От:</strong> {trip.from}</p>
+            <p><strong>До:</strong> {trip.to}</p>
+            <p><strong>Дата:</strong> {new Date(trip.date).toLocaleString()}</p>
+            <p><strong>Мест:</strong> {trip.seatsAvailable}</p>
+            <p><strong>Цена за место:</strong> {trip.pricePerSeat} тг</p>
+          </div>
+        ))}
+        {filteredTrips.length === 0 && <p>Поездки не найдены</p>}
+      </div>
     </div>
   );
 }
