@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import Trips from "./pages/Trips";
 import Bookings from "./pages/Bookings";
 import Navbar from "./components/Navbar";
+import CreateTrip from "./pages/CreateTrip";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/trips" element={<Trips />} />
         <Route path="/bookings" element={<Bookings />} />
+        <Route path="/create-trip" element={<CreateTrip />} />
       </Routes>
     </Router>
   );
