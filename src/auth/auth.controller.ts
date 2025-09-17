@@ -19,4 +19,13 @@ async verifyOtp(@Body() body: { phone: string; otp: string }) {
 // Заглушка: любой OTP принимается
 return this.authService.verifyOtp(body.phone, body.otp);
 }
+
+
+  @Post('login')
+async login(@Body() loginDto: LoginDto) {
+  const user = await this.authService.validateUser(loginDto.email, loginDto.password);
+  if (!user) throw new UnauthorizedException();
+  const token = this.jwtService.sign({ userId: user.id, role: user.role });
+  return { access_token: token, role: user.role };
+}
 }
