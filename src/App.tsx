@@ -3,8 +3,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Trips from "./pages/Trips";
 import Bookings from "./pages/Bookings";
-import Navbar from "./components/Navbar";
 import CreateTrip from "./pages/CreateTrip";
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -13,9 +14,30 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/trips" element={<Trips />} />
-        <Route path="/bookings" element={<Bookings />} />
-        <Route path="/create-trip" element={<CreateTrip />} />
+        <Route
+          path="/trips"
+          element={
+            <ProtectedRoute>
+              <Trips />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/bookings"
+          element={
+            <ProtectedRoute>
+              <Bookings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/create-trip"
+          element={
+            <ProtectedRoute>
+              <CreateTrip />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );
