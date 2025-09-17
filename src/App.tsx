@@ -7,6 +7,7 @@ import CreateTrip from "./pages/CreateTrip";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DriverTrips from "./pages/DriverTrips";
+import DriverDashboard from "./pages/DriverDashboard";
 
 function App() {
   return (
@@ -44,6 +45,14 @@ function App() {
   element={
     <ProtectedRoute>
       <DriverTrips />
+    </ProtectedRoute>
+  }
+/>
+        <Route
+  path="/driver-dashboard"
+  element={
+    <ProtectedRoute>
+      <DriverDashboard />
     </ProtectedRoute>
   }
 />
