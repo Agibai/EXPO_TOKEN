@@ -94,5 +94,13 @@ function App() {
     </Router>
   );
 }
+<Route
+  path="/payment-history"
+  element={
+    <ProtectedRoute allowedRoles={["passenger"]}>
+      <PaymentHistory />
+    </ProtectedRoute>
+  }
+/>
 
 export default App;
