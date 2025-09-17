@@ -7,16 +7,20 @@ interface User {
   email: string;
   phone: string;
   role: string;
+  avatar?: string;
 }
 
 export default function Profile() {
   const [user, setUser] = useState<User | null>(null);
   const [editUser, setEditUser] = useState({ name: "", phone: "" });
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   const fetchUser = () => {
     api.get("/users/me").then((res) => {
       setUser(res.data);
       setEditUser({ name: res.data.name, phone: res.data.phone });
+      setPreview(res.data.avatar || null);
     });
   };
 
@@ -26,7 +30,15 @@ export default function Profile() {
 
   const handleUpdate = async () => {
     try {
-      await api.put(`/users/${user?.id}`, editUser);
+      const formData = new FormData();
+      formData.append("name", editUser.name);
+      formData.append("phone", editUser.phone);
+      if (avatarFile) formData.append("avatar", avatarFile);
+
+      await api.put(`/users/${user?.id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       alert("Профиль обновлен!");
       fetchUser();
     } catch (err: any) {
@@ -43,11 +55,28 @@ export default function Profile() {
     }
   };
 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setAvatarFile(e.target.files[0]);
+      setPreview(URL.createObjectURL(e.target.files[0]));
+    }
+  };
+
   if (!user) return <p>Загрузка...</p>;
 
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Профиль</h1>
+
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Фото профиля</label>
+        <img
+          src={preview || "/default-avatar.png"}
+          alt="avatar"
+          className="w-32 h-32 rounded-full object-cover mb-2"
+        />
+        <input type="file" accept="image/*" onChange={handleAvatarChange} />
+      </div>
 
       <div className="mb-4">
         <label className="block font-semibold">Имя</label>
