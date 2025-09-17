@@ -19,6 +19,9 @@ export default function Navbar() {
           <>
             <Link to="/trips" className="hover:underline">Поездки</Link>
             <Link to="/bookings" className="hover:underline">Бронирования</Link>
+            <Link to="/create-trip" className="bg-green-500 px-3 py-1 rounded hover:bg-green-600">
+              Создать поездку
+            </Link>
             <button onClick={handleLogout} className="bg-red-500 px-3 py-1 rounded hover:bg-red-600">
               Выйти
             </button>
